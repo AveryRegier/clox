@@ -3,9 +3,7 @@
   "version": "0.1.0",
   "description": "A simple contextual logger that writes JSON to the console.",
   "main": "src/index.js",
-  "module": "src/index.js",
   "exports": {
-    "import": "./src/index.js",
     "require": "./src/index.js"
   },
   "scripts": {

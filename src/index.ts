@@ -11,7 +11,7 @@ export type Logger = {
   warn: (msg: string, ...args: MetaData[]) => void;
   error: {
     (msg: string, ...args: MetaData[]): void;
-    (error: Error, msg?: string, ...args: MetaData[]): void;
+    (error: Error | unknown, msg?: string, ...args: MetaData[]): void;
   };
   child: (context: MetaData) => Logger;
   level: LogLevel;
@@ -51,12 +51,12 @@ class LoggerImpl implements Logger {
     this.log('warn', msg, ...args);
   }
   public error(msg: string, ...args: MetaData[]): void;
-  public error(error: Error, msg?: string, ...args: MetaData[]): void;
-  public error(arg1: string | Error, ...rest: any[]): void {
+  public error(error: Error | unknown, msg?: string, ...args: MetaData[]): void;
+  public error(arg1: string | Error | unknown, ...rest: any[]): void {
     if (typeof arg1 === 'string') {
       this.log('error', arg1, ...rest);
     } else {
-      const error: Error = arg1;
+      const error: Error = arg1 as Error;
       const msg: string = rest[0] ?? error?.message ?? 'undefined error';
       const args: MetaData[] = rest.slice(1);
       const errorMeta: MetaData = { err: { message: error?.message ?? 'undefined error', name: error?.name ?? 'undefined', stack: error?.stack ?? undefined   } };
