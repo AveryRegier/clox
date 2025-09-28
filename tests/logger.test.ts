@@ -1,12 +1,7 @@
-import { vi } from 'vitest';
-import Chance from 'chance';
-const chance = new Chance();
-const consoleLogSpy = vi.spyOn(console, 'log');
-const consoleDebugSpy = vi.spyOn(console, 'debug');
-const consoleWarnSpy = vi.spyOn(console, 'warn');
-const consoleErrorSpy = vi.spyOn(console, 'error');
-import logger, { MetaData, getLogger } from '../src/index';
+
+import logger, { getLogger } from '../src/index';
 import { describe, it, expect, afterAll } from 'vitest';
+import { chance, consoleDebugSpy, consoleErrorSpy, consoleLogSpy, consoleWarnSpy } from './console-spies';
 describe('Logger', () => {
   it('logs a message with context', () => {
     const childLogger = logger.child({ user: 'test-user' });
@@ -40,7 +35,7 @@ describe('Logger', () => {
     var errorMeta;
     try {
       throw new Error('Test error details');
-    } catch (err) {
+    } catch (err: any) {
       childLogger.error(err, expectedMsg, { action: 'test-action' });
       errorMeta = { message: err.message, name: err.name, stack: err.stack };
     }
@@ -124,7 +119,7 @@ describe('Logger', () => {
   it('child returns same logger for empty or same context', () => {
     const baseLogger = getLogger({ foo: 'bar' });
     expect(baseLogger.child({})).toBe(baseLogger);
-    expect(baseLogger.child(baseLogger["context"])).toBe(baseLogger);
+    expect(baseLogger.child((baseLogger as any)["context"])).toBe(baseLogger);
   });
   it('logs an error with context', () => {
     const childLogger = logger.child({ user: 'test-user' });
@@ -144,7 +139,7 @@ describe('Logger', () => {
     var errorMeta;
     try {
       throw new Error('Test error details');
-    } catch (err) {
+    } catch (err: any) {
       childLogger.error(err, expectedMsg, { action: 'test-action' });
       errorMeta = { message: err.message, name: err.name, stack: err.stack };
     }
@@ -224,7 +219,7 @@ describe('Logger', () => {
   it('child returns same logger for empty or same context', () => {
     const baseLogger = getLogger({ foo: 'bar' });
     expect(baseLogger.child({})).toBe(baseLogger);
-    expect(baseLogger.child(baseLogger["context"])).toBe(baseLogger);
+    expect(baseLogger.child((baseLogger as any)["context"])).toBe(baseLogger);
   });
 
   it('logs error with default message when no message is provided', () => {
@@ -250,7 +245,7 @@ describe('Logger', () => {
   it('child returns same logger for empty or same context', () => {
     const baseLogger = getLogger({ foo: 'bar' });
     expect(baseLogger.child({})).toBe(baseLogger);
-    expect(baseLogger.child(baseLogger["context"])).toBe(baseLogger);
+    expect(baseLogger.child((baseLogger as any)["context"])).toBe(baseLogger);
   });
 
   it('logs undefined error message correctly', () => {
