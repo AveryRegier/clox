@@ -15,6 +15,7 @@ export class Follower {
         init = (logger: Logger) => { },
         mapStatus: (response: Response) => MetaData = (response: any) => { return response?.statusCode ? { statusCode: response?.statusCode } : {} }
     ): Promise<Response> {
+        const startTime = Date.now();
         const childContext: MetaData = {};
         if (!hasContextKey('contextId')) {
             childContext['contextId'] = uuidv7();
@@ -33,7 +34,8 @@ export class Follower {
                 logger.error(error);
                 throw error;
             } finally {
-                logger.info('Finished following context', { logType: "end", ...status });
+                const elapsedMillis = Date.now() - startTime;
+                logger.info('Finished following context', { logType: "end", elapsedMillis, ...status });
             }
         });
     }

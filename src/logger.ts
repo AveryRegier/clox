@@ -23,7 +23,7 @@ export type Logger = {
 
 class LoggerImpl implements Logger {
   private context: MetaData;
-  public level: LogLevel = 'info'; 
+  public level: LogLevel;
   private levels: Record<string, number> = { debug: 0, info: 10, warn: 20, error: 30 };
   private consoleLevelMap = {
     debug: 'debug',
@@ -32,8 +32,9 @@ class LoggerImpl implements Logger {
     error: 'error',
   }
 
-  constructor(context: MetaData = _getContext() || {}) {
+  constructor(context: MetaData = _getContext() || {}, level: LogLevel = 'info') {
     this.context = context;
+    this.level = level;
   }
 
   private log(level: LogLevel, msg: string, ...args: MetaData[]) {
@@ -69,7 +70,7 @@ class LoggerImpl implements Logger {
     const storeContext = _getContext();
     if(storeContext == null && (context == null || context === this.context || /* context is empty */ Object.keys(context).length === 0)) return this;
     const finalContext = _combineMetaData(this.context, storeContext, context)
-    return new LoggerImpl(finalContext); 
+    return new LoggerImpl(finalContext, this.level);
   }
 
   /**

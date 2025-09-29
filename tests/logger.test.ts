@@ -268,6 +268,16 @@ describe('Logger', () => {
     );
   });
 
+  it('child loggers inherit log level from parent', () => {
+    const parentLogger = getLogger({ component: 'parent' });
+    parentLogger.level = 'warn';
+    const childLogger = parentLogger.child({ component: 'child' });
+    childLogger.info('This should not appear');
+    childLogger.warn('This is a warning from child');
+    expect(consoleLogSpy).not.toHaveBeenCalledWith('This should not appear', expect.anything());
+    expect(consoleWarnSpy).toHaveBeenCalledWith('This is a warning from child', expect.objectContaining({ level: 'warn', component: 'child' }));
+  });
+
   afterAll(() => {
     consoleLogSpy.mockRestore();
     consoleErrorSpy.mockRestore();

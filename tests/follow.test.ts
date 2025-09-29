@@ -13,7 +13,7 @@ describe('follow', () => {
             getLogger().info('Inside follow function', { testKey: 'testValue' });
             expect(consoleLogSpy).toHaveBeenLastCalledWith('Inside follow function', { contextId, testKey: 'testValue', level: 'info', timestamp: expect.any(String) });
         });
-        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String) });
+        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String), elapsedMillis: expect.any(Number) });
     });
 
     it('should not create new contextId if already present in the store', async () => {
@@ -38,9 +38,9 @@ describe('follow', () => {
                 libraryLogger.info('Inside child follow function', { testKey: 'testValue2' });
                 expect(consoleLogSpy).toHaveBeenLastCalledWith('Inside child follow function', { contextId, level: 'info', testKey: 'testValue2', timestamp: expect.any(String) });
             });
-            expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String) });
+            expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String), elapsedMillis: expect.any(Number)  });
         });
-        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, logType: "end", timestamp: expect.any(String), level: 'info' });
+        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, logType: "end", timestamp: expect.any(String), level: 'info', elapsedMillis: expect.any(Number)  });
         logger.info('After follow function');
         const contextIdAfter = getLastContextId();
         expect(contextIdAfter).toBeUndefined();
@@ -62,7 +62,7 @@ describe('follow', () => {
             getLogger().info('Inside follow function');
             expect(consoleLogSpy).toHaveBeenLastCalledWith('Inside follow function', { contextId, level: 'info', timestamp: expect.any(String), testKey: 'testValue', anotherKey: 'anotherValue' });
         });
-        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String), testKey: 'testValue', anotherKey: 'anotherValue' });
+        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String), testKey: 'testValue', anotherKey: 'anotherValue', elapsedMillis: expect.any(Number) });
     });
 
     it('will initialize the logger context before logging start', async () => {
@@ -73,7 +73,7 @@ describe('follow', () => {
             contextId = getLastContextId();
             expect(consoleLogSpy).toHaveBeenLastCalledWith('Following context', { contextId, level: 'info', logType: 'start', timestamp: expect.any(String), initializedKey: 'initializedValue' });
         }, (logger) => { logger.addContext('initializedKey', 'initializedValue'); });
-        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, initializedKey: 'initializedValue', level: 'info', logType: 'end', timestamp: expect.any(String) });
+        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, initializedKey: 'initializedValue', level: 'info', logType: 'end', timestamp: expect.any(String), elapsedMillis: expect.any(Number) });
     });
 
     it('will map status from the response', async () => {
@@ -85,7 +85,7 @@ describe('follow', () => {
             expect(consoleLogSpy).toHaveBeenLastCalledWith('Following context', { contextId, level: 'info', logType: 'start', timestamp: expect.any(String) });
             return { statusCode: 201, data: 'some data' };
         }).then((response) => {
-            expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, statusCode: 201, level: 'info', logType: 'end', timestamp: expect.any(String) });
+            expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, statusCode: 201, level: 'info', logType: 'end', timestamp: expect.any(String), elapsedMillis: expect.any(Number) });
         });
     });
 
@@ -99,7 +99,7 @@ describe('follow', () => {
             throw new Error('Test error');
         })).rejects.toThrow('Test error');
         expect(consoleErrorSpy).toHaveBeenCalledWith('Test error', { contextId, err: { message: 'Test error', name: 'Error', stack: expect.any(String) }, level: 'error', timestamp: expect.any(String) });
-        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String) });
+        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String), elapsedMillis: expect.any(Number) });
     });
 
     function getLastContextId() {
