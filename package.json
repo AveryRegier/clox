@@ -1,6 +1,6 @@
 {
   "name": "clox",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A simple contextual logger that writes JSON to the console.",
   "main": "src/index.js",
   "exports": {

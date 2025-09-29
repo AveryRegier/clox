@@ -38,7 +38,7 @@ class LoggerImpl implements Logger {
 
   private log(level: LogLevel, msg: string, ...args: MetaData[]) {
     if(this.levels[level] < this.levels[this.level]) return;
-    const allContext = { ..._combineMetaData(this.context, ...args), level, timestamp: new Date().toISOString() };
+    const allContext = { ..._combineMetaData(_getContext() || this.context, ...args), level, timestamp: new Date().toISOString() };
     (console as any)[this.consoleLevelMap[level]](msg, allContext);
   }
 

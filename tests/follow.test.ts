@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { MetaData, MetaDataValue, getLogger, Follower, addContext, addContexts } from '../src/index.js';
-import { consoleLogSpy } from './console-spies.js';
+import { consoleErrorSpy, consoleLogSpy } from './console-spies.js';
 
 describe('follow', () => {
     it('should follow the context', async () => {
@@ -62,6 +62,43 @@ describe('follow', () => {
             getLogger().info('Inside follow function');
             expect(consoleLogSpy).toHaveBeenLastCalledWith('Inside follow function', { contextId, level: 'info', timestamp: expect.any(String), testKey: 'testValue', anotherKey: 'anotherValue' });
         });
+        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String), testKey: 'testValue', anotherKey: 'anotherValue' });
+    });
+
+    it('will initialize the logger context before logging start', async () => {
+        const logger = getLogger();
+        const follower = new Follower(logger);
+        let contextId: MetaDataValue | undefined;
+        await follower.follow(async ( ) => {
+            contextId = getLastContextId();
+            expect(consoleLogSpy).toHaveBeenLastCalledWith('Following context', { contextId, level: 'info', logType: 'start', timestamp: expect.any(String), initializedKey: 'initializedValue' });
+        }, (logger) => { logger.addContext('initializedKey', 'initializedValue'); });
+        expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, initializedKey: 'initializedValue', level: 'info', logType: 'end', timestamp: expect.any(String) });
+    });
+
+    it('will map status from the response', async () => {
+        const logger = getLogger();
+        const follower = new Follower(logger);
+        let contextId: MetaDataValue | undefined;
+        await follower.follow(() => {
+            contextId = getLastContextId();
+            expect(consoleLogSpy).toHaveBeenLastCalledWith('Following context', { contextId, level: 'info', logType: 'start', timestamp: expect.any(String) });
+            return { statusCode: 201, data: 'some data' };
+        }).then((response) => {
+            expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, statusCode: 201, level: 'info', logType: 'end', timestamp: expect.any(String) });
+        });
+    });
+
+    it('will log error if function throws', async () => {
+        const logger = getLogger();
+        const follower = new Follower(logger);
+        let contextId: MetaDataValue | undefined;
+        await expect(follower.follow(() => {
+            contextId = getLastContextId();
+            expect(consoleLogSpy).toHaveBeenLastCalledWith('Following context', { contextId, level: 'info', logType: 'start', timestamp: expect.any(String) });
+            throw new Error('Test error');
+        })).rejects.toThrow('Test error');
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Test error', { contextId, err: { message: 'Test error', name: 'Error', stack: expect.any(String) }, level: 'error', timestamp: expect.any(String) });
         expect(consoleLogSpy).toHaveBeenLastCalledWith('Finished following context', { contextId, level: 'info', logType: 'end', timestamp: expect.any(String) });
     });
 

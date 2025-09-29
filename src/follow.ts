@@ -10,17 +10,31 @@ export class Follower {
         this.parentLogger = logger;
     }
 
-    public async follow<Response>(fn: () => Response): Promise<Response> {
+    public async follow<Response>(
+        fn: () => Response,
+        init = (logger: Logger) => { },
+        mapStatus: (response: Response) => MetaData = (response: any) => { return response?.statusCode ? { statusCode: response?.statusCode } : {} }
+    ): Promise<Response> {
         const childContext: MetaData = {};
-        if(!hasContextKey('contextId')) {
+        if (!hasContextKey('contextId')) {
             childContext['contextId'] = uuidv7();
         }
         const logger = this.parentLogger.child(childContext);
-        try {
-            logger.info('Following context', {logType: "start"});
-            return runWithContext(childContext, fn);
-        } finally {
-            logger.info('Finished following context', {logType: "end"});
-        }
+
+        return runWithContext(childContext, async () => {
+            let status: MetaData = {};
+            try {
+                init(logger);
+                logger.info('Following context', { logType: "start" });
+                const response = await fn();
+                status = mapStatus(response);
+                return response;
+            } catch (error) {
+                logger.error(error);
+                throw error;
+            } finally {
+                logger.info('Finished following context', { logType: "end", ...status });
+            }
+        });
     }
 }
