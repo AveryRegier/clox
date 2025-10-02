@@ -44,6 +44,12 @@ const wrapClassWithFollowerForEachPublicMethod = <T extends { new(...args: any[]
             const prop = (this as any)[name];
             if (typeof prop !== 'function') return false;
             if (prop.prototype && prop.prototype.constructor !== prop) return false;
+            if (!Object.prototype.hasOwnProperty.call(OriginalClass.prototype, name)) return false;
+            const descriptor = Object.getOwnPropertyDescriptor(OriginalClass.prototype, name);
+            if (!descriptor) return false;
+            // if the method is not async, exclude it
+            if (descriptor.value && descriptor.value.constructor.name !== 'AsyncFunction') return false;
+            if (descriptor.get || descriptor.set) return false; // exclude getters and setters
             return true;
         }
         _getMethodNames(): string[] {
@@ -66,28 +72,31 @@ const wrapClassWithFollowerForEachPublicMethod = <T extends { new(...args: any[]
             const originalMethod = (this as any)[name];
             const wrappedMethod = async (...args: any[]) => {
                 // get argument names
-                const argNames = this._getArgNames(originalMethod);
-                // create metadata for each argument
-                const metaData: MetaData = {
-                    fn: name,
-                };
-                for (let i = 0; i < args.length; i++) {
-                    const value = args[i];
-                    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-                        metaData[argNames[i]] = value;
-                    }
-                }
-                const proxied = this;
+                const metaData: MetaData = this._createMetaData(name, originalMethod, args);
                 return await this._follower.follow(async () => { 
                     return await originalMethod.apply(this, args);
                 }, (logger) => {
                     if (this._followInit) {
-                        this._followInit.bind(proxied, logger)();
+                        this._followInit(logger);
                     }
                     logger.addContexts(metaData);
                 }, this._mapStatus);
             };
             return wrappedMethod;
+        }
+        _createMetaData(name: string, originalMethod: any, args: any[]): MetaData {
+            const argNames = this._getArgNames(originalMethod);
+            // create metadata for each argument
+            const metaData: MetaData = {
+                fn: name,
+            };
+            for (let i = 0; i < args.length; i++) {
+                const value = args[i];
+                if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                    metaData[argNames[i]] = value;
+                }
+            }
+            return metaData;
         }
         _getArgNames(originalMethod: any): string[] {
             const argNames: string[] = [];
