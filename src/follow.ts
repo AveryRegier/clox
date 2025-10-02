@@ -3,6 +3,9 @@ import { uuidv7 } from 'uuidv7';
 import { hasContextKey, runWithContext } from './context';
 import { Logger, MetaData } from './logger';
 
+export type FollowInit = (logger: Logger) => void;
+export type MapStatus<Response> = (response: Response) => MetaData;
+
 export class Follower {
 
     private parentLogger: Logger;
@@ -12,8 +15,8 @@ export class Follower {
 
     public async follow<Response>(
         fn: () => Response,
-        init = (logger: Logger) => { },
-        mapStatus: (response: Response) => MetaData = (response: any) => { return response?.statusCode ? { statusCode: response?.statusCode } : {} }
+        init: FollowInit = (logger) => { },
+        mapStatus: MapStatus<Response> = (response: any) => { return response?.statusCode ? { statusCode: response?.statusCode } : {} }
     ): Promise<Response> {
         const startTime = Date.now();
         const childContext: MetaData = {};

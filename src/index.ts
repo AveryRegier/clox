@@ -5,3 +5,4 @@ export type { LogLevel, Logger, MetaData, MetaDataValue, BasicMetaDataValue };
 export { getLogger };
 export { Follower } from './follow';
 export { addContext, addContexts } from './context';
+export { followClass } from './proxy';
