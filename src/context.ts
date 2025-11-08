@@ -10,13 +10,15 @@ const asyncLocalStorage = new AsyncLocalStorage<MetaData>();
  * @param key The key to add to the context.
  * @param value The value to add to the context.
  * If the value is undefined or null, it will not be added to the context.
- * @returns void.
+ * @returns The value provided.
  * @see Follower
  */
-export function addContext(key: string, value: MetaDataValue): void {
+export function addContext<T extends MetaDataValue>(key: string, value: T): T {
     const localContext = asyncLocalStorage.getStore();
-    if (!localContext || !value) return;
-    localContext[key] = value;
+    if (localContext && value !== undefined && value !== null) {
+        localContext[key] = value;
+    }
+    return value;
 }
 
 /**
