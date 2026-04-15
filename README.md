@@ -17,11 +17,14 @@ A simple contextual logger for Node.js and TypeScript that writes structured JSO
 npm install clox
 ```
 
-To install directly from a GitHub release tag instead of npm:
+To install the packaged build artifact from GitHub Releases:
 
 ```bash
-npm install github:AveryRegier/clox#v0.2.3
+npm install https://github.com/AveryRegier/clox/releases/download/v0.2.4/clox-0.2.4.tgz
 ```
+
+Note: github:AveryRegier/clox#vX.Y.Z installs GitHub's source archive for that tag.
+Use the Releases .tgz URL when you need the packaged output.
 
 ## Usage
 
@@ -88,12 +91,12 @@ For applications that previously used `file:` dependencies, switch to a GitHub t
 ```json
 {
 	"dependencies": {
-		"clox": "github:AveryRegier/clox#v0.2.3"
+		"clox": "https://github.com/AveryRegier/clox/releases/download/v0.2.4/clox-0.2.4.tgz"
 	}
 }
 ```
 
-Update to a newer release by changing the tag (for example `v0.2.3`) and running install again.
+Update to a newer release by changing both version segments in the URL and running install again.
 If you need to roll back, pin to the previous known-good tag.
 
 ## License

@@ -30,10 +30,16 @@ jobs:
       - name: Pack release artifact
         run: npm run pack:release
 
+      - name: Zip dist artifact
+        run: zip -r release-artifacts/dist-${{ github.ref_name }}.zip dist
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: release-artifacts/*.tgz
+          files: |
+            release-artifacts/*.tgz
+            release-artifacts/dist-*.zip
+          fail_on_unmatched_files: true
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
