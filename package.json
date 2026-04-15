@@ -12,8 +12,8 @@
     "test": "vitest",
     "prepare": "npm run build",
     "pack:release": "npm pack --pack-destination release-artifacts",
-    "release": "release-it",
-    "release:dry": "release-it --dry-run",
+    "release": "release-it --ci --no-github.release",
+    "release:dry": "release-it --dry-run --ci --no-github.release",
     "clean": "rimraf dist coverage",
     "coverage": "vitest --run --coverage"
   },
@@ -50,17 +50,10 @@
       "push": true
     },
     "github": {
-      "release": true,
-      "assets": [
-        "release-artifacts/*.tgz"
-      ]
+      "release": false
     },
     "npm": {
       "publish": false
-    },
-    "hooks": {
-      "before:init": "rimraf release-artifacts",
-      "before:github.release": "npm run pack:release"
     },
     "plugins": {
       "@release-it/conventional-changelog": {

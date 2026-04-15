@@ -54,12 +54,7 @@ This repository is configured for GitHub releases (no npm publish step).
 ### Prerequisites
 
 1. Conventional commits are used to determine version bumps and release notes.
-2. Set a GitHub token with repo permissions:
-
-```bash
-# PowerShell
-$env:GITHUB_TOKEN = "<your-token>"
-```
+2. GitHub Actions must be enabled for this repository.
 
 ### Commands
 
@@ -75,16 +70,16 @@ Create the release:
 npm run release
 ```
 
-After `npm run release` pushes the `vX.Y.Z` tag, GitHub Actions automatically builds,
-packs, and uploads the `.tgz` package artifact to the matching GitHub Release.
-No manual upload step is required.
+After `npm run release`, the command creates and pushes a `vX.Y.Z` tag non-interactively.
+That tag triggers GitHub Actions to create/update the GitHub Release, build the package,
+and upload the `.tgz` artifact automatically. No manual upload step is required.
 
 The release command will:
 
 1. Calculate the next semver version from commit history.
 2. Create a release commit and `vX.Y.Z` tag.
 3. Push commit and tag.
-4. Create a GitHub Release with generated notes.
+4. Trigger GitHub Actions to create/update the GitHub Release and attach assets.
 
 ## Using a GitHub Release in package.json
 
