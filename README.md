@@ -17,6 +17,12 @@ A simple contextual logger for Node.js and TypeScript that writes structured JSO
 npm install clox
 ```
 
+To install directly from a GitHub release tag instead of npm:
+
+```bash
+npm install github:AveryRegier/clox#v0.2.2
+```
+
 ## Usage
 
 ```typescript
@@ -40,6 +46,56 @@ The default log level is 'info'.
 ```typescript
 logger.level = 'debug'; // show all logs
 ```
+
+## Releasing
+
+This repository is configured for GitHub releases (no npm publish step).
+
+### Prerequisites
+
+1. Conventional commits are used to determine version bumps and release notes.
+2. Set a GitHub token with repo permissions:
+
+```bash
+# PowerShell
+$env:GITHUB_TOKEN = "<your-token>"
+```
+
+### Commands
+
+Preview the next release:
+
+```bash
+npm run release:dry
+```
+
+Create the release:
+
+```bash
+npm run release
+```
+
+The release command will:
+
+1. Calculate the next semver version from commit history.
+2. Create a release commit and `vX.Y.Z` tag.
+3. Push commit and tag.
+4. Create a GitHub Release with generated notes.
+
+## Using a GitHub Release in package.json
+
+For applications that previously used `file:` dependencies, switch to a GitHub tag reference.
+
+```json
+{
+	"dependencies": {
+		"clox": "github:AveryRegier/clox#v0.2.2"
+	}
+}
+```
+
+Update to a newer release by changing the tag (for example `v0.2.3`) and running install again.
+If you need to roll back, pin to the previous known-good tag.
 
 ## License
 
