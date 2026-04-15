@@ -1,6 +1,6 @@
 {
   "name": "clox",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A simple contextual logger that writes JSON to the console.",
   "main": "dist/index.js",
   "exports": {
@@ -11,6 +11,7 @@
     "build": "tsc && node scripts/copy-package.js",
     "test": "vitest",
     "prepare": "npm run build",
+    "pack:release": "npm pack --pack-destination release-artifacts",
     "release": "release-it",
     "release:dry": "release-it --dry-run",
     "clean": "rimraf dist coverage",
@@ -49,10 +50,17 @@
       "push": true
     },
     "github": {
-      "release": true
+      "release": true,
+      "assets": [
+        "release-artifacts/*.tgz"
+      ]
     },
     "npm": {
       "publish": false
+    },
+    "hooks": {
+      "before:init": "rimraf release-artifacts",
+      "before:github.release": "npm run pack:release"
     },
     "plugins": {
       "@release-it/conventional-changelog": {

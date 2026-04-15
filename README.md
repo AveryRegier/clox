@@ -20,7 +20,7 @@ npm install clox
 To install directly from a GitHub release tag instead of npm:
 
 ```bash
-npm install github:AveryRegier/clox#v0.2.2
+npm install github:AveryRegier/clox#v0.2.3
 ```
 
 ## Usage
@@ -75,6 +75,10 @@ Create the release:
 npm run release
 ```
 
+After `npm run release` pushes the `vX.Y.Z` tag, GitHub Actions automatically builds,
+packs, and uploads the `.tgz` package artifact to the matching GitHub Release.
+No manual upload step is required.
+
 The release command will:
 
 1. Calculate the next semver version from commit history.
@@ -89,7 +93,7 @@ For applications that previously used `file:` dependencies, switch to a GitHub t
 ```json
 {
 	"dependencies": {
-		"clox": "github:AveryRegier/clox#v0.2.2"
+		"clox": "github:AveryRegier/clox#v0.2.3"
 	}
 }
 ```
