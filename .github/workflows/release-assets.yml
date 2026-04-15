@@ -30,6 +30,13 @@ jobs:
       - name: Pack release artifact
         run: npm run pack:release
 
+      - name: Verify tarball contains compiled output
+        run: |
+          set -e
+          TARFILE=$(ls release-artifacts/*.tgz)
+          tar -tzf "$TARFILE" | grep -q '^package/dist/index.js$'
+          tar -tzf "$TARFILE" | grep -q '^package/dist/index.d.ts$'
+
       - name: Zip dist artifact
         run: zip -r release-artifacts/dist-${{ github.ref_name }}.zip dist
 
